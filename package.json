@@ -1,0 +1,20 @@
+{
+  "name": "penplot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "new-array": "^1.0.0",
+    "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
+    "simplex-noise": "^2.4.0",
+    "vector": "git+https://github.com/Evelios/Vector.git"
+  },
+  "devDependencies": {
+    "tape": "^4.9.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
