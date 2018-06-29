@@ -19,21 +19,26 @@ export default function createPlot (context, dimensions) {
   const working_height = height - margin;
 
   const center = [width / 2, height / 2];
-  const circleRadius = 5;
-  const polygonSides = 10;
-  const numberOfCircles = 1;
-  const circleZSpacing = 0.5;
+  const maxCircleRadius = 7.5;
+  const minCircleRadius = 2;
+  const polygonSides = 300;
+  const numberOfCircles = 200;
+  const circleZSpacing = 0.125;
   const noiseStrength = 2;
-  const noiseScale = 0.1;
+  const noiseScale = 0.125;
   const simplex = new SimplexNoise();
 
   let lines = newArray(numberOfCircles).map((_, cirNum) => {
 
+    const circleRadius = minCircleRadius + (maxCircleRadius - minCircleRadius) * cirNum / numberOfCircles;
     let circle = regularPolygon(polygonSides, center, circleRadius);
+    // There is a bug in here somewhere. It could have to do with the
+    // angle function clamping when x=0. There are weird artifacts at
+    // the top and bottom of the circles (and occasionally broken things)
+
+    // Offset the circle verticies by a noise function
     circle = circle.map((vertex) => {
-      console.log(Vector.subtract(center, vertex));
       const angle = Vector.angle(Vector.subtract(center, vertex));
-      console.log(angle * 180 / (2*Math.PI));
       const noiseAmmount = noiseStrength * simplex.noise3D(
         noiseScale * vertex[0],
         noiseScale * vertex[1],
@@ -42,6 +47,7 @@ export default function createPlot (context, dimensions) {
       const noiseVector = Vector.Polar(noiseAmmount, angle);
       return Vector.add(vertex, noiseVector);
     });
+    
     return circle;
 
   });
