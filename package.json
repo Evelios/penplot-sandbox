@@ -1,8 +1,9 @@
 {
   "name": "penplot",
   "version": "1.0.0",
-  "description": "",
+  "description": "A little sandbox where I am playing with some generative designs",
   "main": "index.js",
+  "repository": "https://github.com/Evelios/penplot-sandbox",
   "dependencies": {
     "new-array": "^1.0.0",
     "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
