@@ -18,20 +18,24 @@ export default function createPlot (context, dimensions) {
   const working_width = width - margin;
   const working_height = height - margin;
 
-  const center = [width / 2, height / 2];
+  const center = [2 * width / 7, 3 * height / 4];
   const maxCircleRadius = 7.5;
-  const minCircleRadius = 2;
+  const minCircleRadius = 1.5;
   const polygonSides = 300;
   const numberOfCircles = 200;
   const circleZSpacing = 0.125;
-  const noiseStrength = 2;
-  const noiseScale = 0.125;
+  const noiseStrength = 1.5;
+  const noiseScale = 0.15;
   const simplex = new SimplexNoise();
 
   let lines = newArray(numberOfCircles).map((_, cirNum) => {
+    const cirPos = Vector.add(center, [
+        1.25 * working_width  / 7 * cirNum / numberOfCircles,
+           -working_height / 4 * cirNum / numberOfCircles
+      ]);
 
     const circleRadius = minCircleRadius + (maxCircleRadius - minCircleRadius) * cirNum / numberOfCircles;
-    let circle = regularPolygon(polygonSides, center, circleRadius);
+    let circle = regularPolygon(polygonSides, cirPos, circleRadius);
     // There is a bug in here somewhere. It could have to do with the
     // angle function clamping when x=0. There are weird artifacts at
     // the top and bottom of the circles (and occasionally broken things)
@@ -59,7 +63,7 @@ export default function createPlot (context, dimensions) {
   return {
     draw,
     print,
-    background: 'white',
+    background: '#eaeaea',
     animate: false,
     clear: true
   };
@@ -67,13 +71,9 @@ export default function createPlot (context, dimensions) {
   function draw () {
         
     lines.forEach(circle => {
-
-      // Fill in the stroke in polygon context
       context.beginPath();
       circle.forEach(p => context.lineTo(p[0], p[1]));
-      context.lineTo(circle[0][0], circle[0][1]);
       context.stroke();
-
     });
   }
 

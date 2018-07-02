@@ -7,13 +7,12 @@
  * @returns 
  */
 export default function linesToList(input) {
-  console.log(input);
 
   if (!Array.isArray(input)) {
     throw TypeError('Input value is not an array type ' + input);
   }
 
-  if (isLine(input)) {
+  if (isPath(input)) {
     return input;
   }
 
@@ -41,4 +40,11 @@ function isLine(obj) {
          Array.isArray(obj[0]) && Array.isArray(obj[1]) &&
          !isNaN(obj[0][0])     && !isNaN(obj[0][1])     &&
          !isNaN(obj[1][0])     && !isNaN(obj[1][1]);
+}
+
+function isPath(obj) {
+  return Array.isArray(obj) && obj.length != 0 && obj.length != 1 &&
+    obj.reduce((acc, cur) => {
+      return acc && !isNaN(cur[0]) && !isNaN(cur[1]);
+    }, true);
 }
