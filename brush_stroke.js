@@ -77,7 +77,7 @@ export default function createPlot (context, dimensions) {
   }
 
   function print () {
-    return polylinesToSVG(lines, {
+    return polylinesToSVG(flattenLineTree(lines), {
       dimensions
     });
   }
