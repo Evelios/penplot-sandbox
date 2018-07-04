@@ -14,13 +14,13 @@ function linesToList(input) {
     throw TypeError('Input value is not an array type');
   }
 
-  if (isLine(input)) {
+  if (isPath(input)) {
     return input;
   }
 
   let output = [];
   input.forEach(ele => {
-    if (isLine(ele)) {
+    if (isPath(ele)) {
       output.push(ele);
     } else {
       output = output.concat(linesToList(ele));
@@ -65,6 +65,13 @@ function isLine(obj) {
          !isNaN(obj[1][0])     && !isNaN(obj[1][1]);
 }
 
+function isPath(obj) {
+  return Array.isArray(obj) && obj.length != 0 && obj.length != 1 &&
+    obj.reduce((acc, cur) => {
+      return acc && !isNaN(cur[0]) && !isNaN(cur[1]);
+    }, true);
+}
+
 /**
   * Returns true if the object is a line written in the followng form
   * 
@@ -88,10 +95,10 @@ test("Is Object a Line", function(t) {
   const bad1 = [[[1, 2], [2, 5]], [[-61, 1], [53, -1]]];
   const bad2 = [[1, 2], [2, 5], [[-61, 1], [53, -1]]];
 
-  t.ok(isLine(good1));
-  t.ok(isLine(good2));
-  t.notOk(isLine(bad1));
-  t.notOk(isLine(bad2));
+  t.ok(isPath(good1));
+  t.ok(isPath(good2));
+  t.notOk(isPath(bad1));
+  t.notOk(isPath(bad2));
   t.end();
 });
 

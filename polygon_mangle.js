@@ -2,11 +2,11 @@ import newArray from 'new-array';
 import Vector from "vector";
 import regularPolygon from "regular-polygon";
 import { PaperSize, Orientation } from 'penplot';
-import { setSeed } from 'penplot/util/random';
+import { setSeed, randomFloat } from 'penplot/util/random';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
 
-setSeed(2);
+setSeed();
 
 export const orientation = Orientation.LANDSCAPE;
 export const dimensions = PaperSize.LETTER;
@@ -32,8 +32,8 @@ export default function createPlot (context, dimensions) {
 
       let polygon = regularPolygon(col + 3, box_center, 0.2 + row / num_rows * max_poly_size);
       polygon = polygon.map(point => {
-        const jitter = Vector.Polar(Math.random() * row / num_rows * jitter_size,
-                                    Math.random() * 2*Math.PI);
+        const jitter = Vector.Polar(randomFloat(0, row / num_rows * jitter_size),
+                                    randomFloat(0, 2*Math.PI));
         return Vector.add(point, jitter);
       });
       
