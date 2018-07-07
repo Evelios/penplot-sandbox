@@ -1,7 +1,3 @@
-//
-// Todo: Add Directionality
-//
-
 import newArray from 'new-array';
 import Vector from 'vector';
 import regularPolygon from 'regular-polygon';
@@ -57,19 +53,19 @@ export default function createPlot(context, dimensions) {
   function generate_spokes(polygon_verticies) {
     const verticies_and_midpoints = polygon_verticies.reduce((acc, curr, index, array) => {
       const next_point = array[(index + 1) % array.length];
-      return acc.concat([ curr, Vector.midpoint(curr, next_point) ]);
+      return acc.concat([curr, Vector.midpoint(curr, next_point)]);
     }, []);
 
     let alchemy_spokes = [];
     const combined_length = verticies_and_midpoints.length;
-    
+
     for (let vertex_index = 0; vertex_index < combined_length; vertex_index += 2) {
-    // for (let vertex_index = 2; vertex_index < 4; vertex_index += 2) {
+    // for (let vertex_index = 0; vertex_index < 2; vertex_index += 2) {
       // Generate the spoke line
       const opposite_index = (vertex_index + combined_length / 2 + 1) % combined_length;
       const vertex = verticies_and_midpoints[vertex_index];
       const opposite_point = verticies_and_midpoints[opposite_index];
-      
+
       const extended_spoke = [
         vertex,
         opposite_point
@@ -78,8 +74,8 @@ export default function createPlot(context, dimensions) {
       // alchemy_spokes.push(extended_spoke); // For Debug
 
       // Generate the line that will be the point for the spoke
-      const adjacent_index = (combined_length + vertex_index - 1) % combined_length;
-      const opposite_adj_index = (adjacent_index + combined_length / 2) % combined_length;
+      const adjacent_index = (combined_length + vertex_index - 2) % combined_length;
+      const opposite_adj_index = (adjacent_index + combined_length / 2 + 1) % combined_length;
       const adjacent_vertex = verticies_and_midpoints[adjacent_index];
       const opposite_adj_vertex = verticies_and_midpoints[opposite_adj_index];
 
