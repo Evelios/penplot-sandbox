@@ -47,10 +47,37 @@ module.exports = (function() {
     return regularPolygon(nsides, center, radius, rotation);
   };
 
+  /**
+   * Create an elemental circle which consists of two circles with a polygon
+   * in the center. The outer ring created by the two outer circles contains
+   * 'n' small circles. The number of circles 'n' is the number of edges in
+   * the inner polygon.
+   * 
+   * @param {Vector} center 
+   * @param {number} radius 
+   * @param {number} nsides 
+   */
+  var elementCircle = function(polynum, center, radius, circle_sides=100) {
+    const inner_radius = radius * Math.cos(Math.PI / polynum);
+    const ele_circle_radius = (radius - inner_radius) / 2;
+
+    const outer_circle =  regularPolygon(circle_sides, center, radius);
+    const inner_circle =  regularPolygon(circle_sides, center, inner_radius);
+    const inner_polygon = regularPolygon(polynum,      center, inner_radius);
+
+    const ele_circle_centers = regularPolygon(polynum, center, radius - ele_circle_radius);
+    const outer_circles = ele_circle_centers.map(vertex => {
+      return regularPolygon(circle_sides, vertex, ele_circle_radius);
+    });
+
+    return [outer_circle, outer_circles, inner_circle, inner_polygon];
+  };
+
   return {
     incircle        : incircle,
     outcircle       : outcircle,
     inscribePolygon : inscribePolygon,
+    elementCircle   : elementCircle,
   };
 
 })();

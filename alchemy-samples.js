@@ -38,9 +38,7 @@ export default function createPlot(context, dimensions) {
       const designPatterns = {
       
         0 : () => {
-            const base = regularPolygon(poly_sides, poly_center, circle_radius);
-            const inside = Alchemy.incircle(base, poly_center);
-            return [base, inside];
+            return Alchemy.elementCircle(poly_sides, poly_center, circle_radius);
         },
 
         1 : () => {
