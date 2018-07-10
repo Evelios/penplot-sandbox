@@ -1,10 +1,12 @@
 import newArray from 'new-array';
-import Vector from 'vector';
-import regularPolygon from 'regular-polygon';
-import flattenLineTree from './flatten-line-tree';
 import { PaperSize, Orientation } from 'penplot';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
+
+import Vector from 'vector';
+import regularPolygon from 'regular-polygon';
+import flattenLineTree from './flatten-line-tree';
+import Alchemy from './alchemy-bundle';
 
 export const orientation = Orientation.LANDSCAPE;
 export const dimensions = PaperSize.LETTER;
@@ -32,19 +34,25 @@ export default function createPlot(context, dimensions) {
       ];
 
       let out = [];
-      
+
       const designPatterns = {
       
         0 : () => {
-          return regularPolygon(circle_sides, poly_center, circle_radius);
+            const base = regularPolygon(poly_sides, poly_center, circle_radius);
+            const inside = Alchemy.incircle(base, poly_center);
+            return [base, inside];
         },
 
         1 : () => {
-          return regularPolygon(circle_sides, poly_center, circle_radius);
+          const base = regularPolygon(poly_sides, poly_center, circle_radius);
+          const outside = Alchemy.outcircle(base, poly_center);
+          return [base, outside];
         },
 
         2 : () => {
-          return regularPolygon(circle_sides, poly_center, circle_radius);
+          const base = regularPolygon(poly_sides, poly_center, circle_radius);
+          const inside = Alchemy.inscribePolygon(base, poly_center);
+          return [base, inside];
         }
 
       };
@@ -55,18 +63,24 @@ export default function createPlot(context, dimensions) {
 
   // --- Draw to the Web Canvas -----------------------------------------------
   function draw() {
-    console.log(flattenLineTree(lines));
+    console.log(flattenLineTree(lines, true));
 
-    lines.forEach(row => {
-      row.forEach(polygonGroup => {
-        polygonGroup.forEach(poly => {
-          context.beginPath();
-          poly.forEach(p => context.lineTo(p[0], p[1]));
-          context.lineTo(poly[0][0], poly[0][1]);
-          context.stroke();
-        });
-      });
+    flattenLineTree(lines, true).forEach(path => {
+      context.beginPath();
+      path.forEach(p => context.lineTo(p[0], p[1]));
+      context.stroke();
     });
+
+    // lines.forEach(row => {
+    //   row.forEach(polygonGroup => {
+    //     polygonGroup.forEach(poly => {
+    //       context.beginPath();
+    //       poly.forEach(p => context.lineTo(p[0], p[1]));
+    //       context.lineTo(poly[0][0], poly[0][1]);
+    //       context.stroke();
+    //     });
+    //   });
+    // });
 
   }
 

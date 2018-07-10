@@ -6,22 +6,31 @@
  * @param {any} input 
  * @returns 
  */
-export default function linesToList(input) {
+export default function linesToList(input, loopPath=false) {
 
   if (!Array.isArray(input)) {
     throw TypeError('Input value is not an array type ' + input);
   }
 
-  if (isPath(input)) {
+  if (isLine(input)) {
     return input;
+  }
+  else if (isPath(input)) {
+    return loopPath ? input.concat([input[0]]) : input;
   }
 
   let output = [];
   input.forEach(ele => {
+
     if (isLine(ele)) {
       output.push(ele);
-    } else {
-      output = output.concat(linesToList(ele));
+    }
+    else if (isPath(ele)) {
+      const path = loopPath ? ele.concat([ele[0]]) : ele;
+      output.push(path);
+    }
+    else {
+      output = output.concat(linesToList(ele, loopPath));
     }
   });
 

@@ -11,7 +11,7 @@ module.exports = (function() {
    */
   var incircle = function(polygon, center=Vector.avg(polygon), nsides=100) {
     const base_radius = Vector.distance(polygon[0], center);
-    const radius = base_radius + Math.cos(Math.PI / polygon.length);
+    const radius = base_radius * Math.cos(Math.PI / polygon.length);
     return regularPolygon(nsides, center, radius);
   };
 
@@ -35,13 +35,14 @@ module.exports = (function() {
    * @returns {Vector[]} The inscribed polygon
    */
   var inscribePolygon = function(polygon, center=Vector.avg(polygon)) {
-    const nsides = polyogn.length;
+    const nsides = polygon.length;
 
-    const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
+    // const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
+    const base_rotation = 0;
     const rotation = base_rotation + Math.PI / nsides;
 
     const base_radius = Vector.distance(polygon[0], center);
-    const radius = base_radius + Math.cos(Math.PI / nsides);
+    const radius = base_radius * Math.cos(Math.PI / nsides);
 
     return regularPolygon(nsides, center, radius, rotation);
   };
@@ -52,4 +53,4 @@ module.exports = (function() {
     inscribePolygon : inscribePolygon,
   };
 
-});
+})();
