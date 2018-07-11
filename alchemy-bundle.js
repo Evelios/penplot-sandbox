@@ -1,5 +1,5 @@
-import Vector from "vector";
-import regularPolygon from "regular-polygon";
+import Vector from 'vector';
+import regularPolygon from 'regular-polygon';
 
 module.exports = (function() {
 
@@ -37,8 +37,7 @@ module.exports = (function() {
   var inscribePolygon = function(polygon, center=Vector.avg(polygon)) {
     const nsides = polygon.length;
 
-    // const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
-    const base_rotation = 0;
+    const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
     const rotation = base_rotation + Math.PI / nsides;
 
     const base_radius = Vector.distance(polygon[0], center);
@@ -57,15 +56,15 @@ module.exports = (function() {
    * @param {number} radius 
    * @param {number} nsides 
    */
-  var elementCircle = function(polynum, center, radius, circle_sides=100) {
+  var elementCircle = function(polynum, center, radius, rotation=Math.PI/2, circle_sides=100) {
     const inner_radius = radius * Math.cos(Math.PI / polynum);
     const ele_circle_radius = (radius - inner_radius) / 2;
 
-    const outer_circle =  regularPolygon(circle_sides, center, radius);
-    const inner_circle =  regularPolygon(circle_sides, center, inner_radius);
-    const inner_polygon = regularPolygon(polynum,      center, inner_radius);
+    const outer_circle =  regularPolygon(circle_sides, center, radius, rotation);
+    const inner_circle =  regularPolygon(circle_sides, center, inner_radius, rotation);
+    const inner_polygon = regularPolygon(polynum,      center, inner_radius, rotation);
 
-    const ele_circle_centers = regularPolygon(polynum, center, radius - ele_circle_radius);
+    const ele_circle_centers = regularPolygon(polynum, center, radius - ele_circle_radius, rotation);
     const outer_circles = ele_circle_centers.map(vertex => {
       return regularPolygon(circle_sides, vertex, ele_circle_radius);
     });

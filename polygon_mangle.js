@@ -5,6 +5,7 @@ import { PaperSize, Orientation } from 'penplot';
 import { setSeed, randomFloat } from 'penplot/util/random';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
+import flattenLineTree from './flatten-line-tree';
 
 setSeed();
 
@@ -69,7 +70,7 @@ export default function createPlot (context, dimensions) {
   }
 
   function print () {
-    return polylinesToSVG(lines, {
+    return polylinesToSVG(flattenLineTree(lines, true), {
       dimensions
     });
   }
