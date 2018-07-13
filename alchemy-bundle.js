@@ -88,7 +88,53 @@ module.exports = (function() {
   //---- Complex Behaviors -----------------------------------------------------
 
   var cage = function(polygon, ammount=0.5) {
+    const inset_polygon = inset(polygon, ammount);
+    let spokes = [];
 
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([polygon[vertex], inset_polygon[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage2 = function(polygon, ammount=0.5) {
+    const midpoints = inscribePolygon(polygon);
+    const inset_polygon = inset(polygon, ammount);
+    const inset_midpoints = inscribePolygon(inset_polygon);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([midpoints[vertex], inset_midpoints[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage3 = function(polygon, ammount=0.5) {
+    const inset_rotation = -Math.PI / polygon.length;
+    const inset_polygon = inset(polygon, ammount, inset_rotation);
+    const inset_midpoints = inscribePolygon(inset_polygon);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([polygon[vertex], inset_midpoints[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage4 = function(polygon, ammount=0.5) {
+    const midpoints = inscribePolygon(polygon);
+    const inset_rotation = Math.PI / polygon.length;
+    const inset_polygon = inset(polygon, ammount, inset_rotation);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([midpoints[vertex], inset_polygon[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
   };
 
   /**
@@ -128,6 +174,9 @@ module.exports = (function() {
 
     // Shrink
     cage             : cage,
+    cage2            : cage2,
+    cage3            : cage3,
+    cage4            : cage4,
 
     // Advanced
     elementCircle    : elementCircle,
