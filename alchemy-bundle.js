@@ -3,6 +3,49 @@ import regularPolygon from 'regular-polygon';
 
 module.exports = (function() {
 
+  //---- Basic Functions -------------------------------------------------------
+  var connectVerticies = function(polygon) {
+    if (polygon.length % 2 !== 0) {
+      return connectMidpoints(polygon);
+    }
+
+    let out_lines = [];
+    for (let vertex = 0; vertex < polygon.length / 2; vertex++) {
+      const opposite_vertex = (vertex + polygon.length / 2) % polygon.length;
+      out_lines.push([polygon[vertex], polygon[opposite_vertex]]);
+    }
+
+    return out_lines;
+  };
+
+  var connectMidpoints = function(polygon) {
+    let out_lines = [];
+    const midpoints = inscribePolygon(polygon);
+
+    if (polygon.length % 2 === 0) {
+      for (let vertex = 0; vertex < midpoints.length / 2; vertex++) {
+        const opposite_vertex = (vertex + midpoints.length / 2) % midpoints.length;
+        out_lines.push([midpoints[vertex], midpoints[opposite_vertex]]);
+      }
+    }
+    else {
+      for (let vertex = 0; vertex < polygon.length; vertex++) {
+        const opposite_vertex = (vertex + Math.floor(polygon.length / 2)) % polygon.length;
+        out_lines.push([polygon[vertex], midpoints[opposite_vertex]]);
+      }
+    }
+
+    return out_lines;  
+  };
+
+  var inset = function(polygon, ammount=0.5, rotation=0) {
+    const center = Vector.avg(polygon);
+    const base_radius = Vector.distance(polygon[0], center);
+    const radius = base_radius * ammount;
+    const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
+    const inset_rotation = base_rotation + rotation;
+    return regularPolygon(polygon.length, center, radius, inset_rotation);
+  };
 
   /**
    * Create a circle that is inscribed in a polygon
@@ -36,14 +79,62 @@ module.exports = (function() {
    */
   var inscribePolygon = function(polygon, center=Vector.avg(polygon)) {
     const nsides = polygon.length;
+    const rotation = Math.PI / nsides;
+    const inset_ammount = Math.cos(Math.PI / nsides);
 
-    const base_rotation = Vector.angle(Vector.subtract(polygon[0], center));
-    const rotation = base_rotation + Math.PI / nsides;
+    return inset(polygon, inset_ammount, rotation);
+  };
 
-    const base_radius = Vector.distance(polygon[0], center);
-    const radius = base_radius * Math.cos(Math.PI / nsides);
+  //---- Complex Behaviors -----------------------------------------------------
 
-    return regularPolygon(nsides, center, radius, rotation);
+  var cage = function(polygon, ammount=0.5) {
+    const inset_polygon = inset(polygon, ammount);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([polygon[vertex], inset_polygon[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage2 = function(polygon, ammount=0.5) {
+    const midpoints = inscribePolygon(polygon);
+    const inset_polygon = inset(polygon, ammount);
+    const inset_midpoints = inscribePolygon(inset_polygon);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([midpoints[vertex], inset_midpoints[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage3 = function(polygon, ammount=0.5) {
+    const inset_rotation = -Math.PI / polygon.length;
+    const inset_polygon = inset(polygon, ammount, inset_rotation);
+    const inset_midpoints = inscribePolygon(inset_polygon);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([polygon[vertex], inset_midpoints[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
+  };
+
+  var cage4 = function(polygon, ammount=0.5) {
+    const midpoints = inscribePolygon(polygon);
+    const inset_rotation = Math.PI / polygon.length;
+    const inset_polygon = inset(polygon, ammount, inset_rotation);
+    let spokes = [];
+
+    for (let vertex = 0; vertex < polygon.length; vertex++) {
+      spokes.push([midpoints[vertex], inset_polygon[vertex]]);
+    }
+
+    return [inset_polygon, spokes];
   };
 
   /**
@@ -73,10 +164,22 @@ module.exports = (function() {
   };
 
   return {
-    incircle        : incircle,
-    outcircle       : outcircle,
-    inscribePolygon : inscribePolygon,
-    elementCircle   : elementCircle,
+    // Basic
+    connectVerticies : connectVerticies,
+    connectMidpoints : connectMidpoints,
+    inset            : inset,
+    incircle         : incircle,
+    outcircle        : outcircle,
+    inscribePolygon  : inscribePolygon,
+
+    // Shrink
+    cage             : cage,
+    cage2            : cage2,
+    cage3            : cage3,
+    cage4            : cage4,
+
+    // Advanced
+    elementCircle    : elementCircle,
   };
 
 })();
