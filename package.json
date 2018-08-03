@@ -12,7 +12,8 @@
     "optimize-paths": "git+https://github.com/Evelios/optimize-path.git",
     "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
     "simplex-noise": "^2.4.0",
-    "vector": "git+https://github.com/Evelios/Vector.git"
+    "vector": "git+https://github.com/Evelios/Vector.git",
+    "worley-noise": "^1.0.1"
   },
   "devDependencies": {
     "tape": "^4.9.1"
