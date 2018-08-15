@@ -21,26 +21,28 @@ export default function createPlot(context, dimensions) {
 
   const center = [width / 2, height / 2];
   const maxCircleRadius = 7.5;
-  const minCircleRadius = 1.5;
+  const minCircleRadius = 0.1;
   const polygonSides = 300;
-  const numberOfCircles = 50;
+  const numberOfCircles = 60;
   const circleZSpacing = 0;
   const noiseStrength = 1;
   const noiseScale = 0.05;
   const simplex = new SimplexNoise();
-  const pen_thickness = 0.2;
-  const max_line_width = 0.5;
-  const min_line_width = 0.2;
+  const pen_thickness = 0.03;
+  const max_line_width = 0.1;
+  const min_line_width = pen_thickness;
 
   let lines = newArray(numberOfCircles).map((_, cirNum) => {
     const cirPos = center;
     const normalizedCirNum = cirNum / numberOfCircles;
     const radiusAdjustment = Math.sin(Math.PI * normalizedCirNum); // For looking more rounded
-    const circleRadius = maxCircleRadius * normalizedCirNum;
+    const circleRadius = minCircleRadius + maxCircleRadius * radiusAdjustment;
     let circle = regularPolygon(polygonSides, cirPos, circleRadius);
     circle.push(circle[0]);
-    // const line_width =  min_line_width + normalizedCirNum * (max_line_width - min_line_width);
-    const line_width = max_line_width;
+
+    const line_width =  min_line_width + 
+      ((noiseFunction(Vector.Polar(circleRadius * 20, 0)) + 1) / 2) *
+      (max_line_width - min_line_width);
 
     // Offset the circle verticies by a noise function
     circle = circle.map((vertex) => {
@@ -51,15 +53,20 @@ export default function createPlot(context, dimensions) {
       return Vector.add(vertex, noiseVector);
     });
 
+    // console.log("Before", circle);
     circle = createStroke(circle, line_width, pen_thickness);
+    // console.log("After", circle);
 
     return circle;
 
   });
 
+  lines.shift(); // Hack to remove not working circle
+
+  
   // Clip all the lines to a margin
   const box = [margin, margin, working_width, working_height];
-  lines = clipPolylinesToBox(lines, box);
+  lines = clipPolylinesToBox(flattenLineTree(lines), box);
 
   return {
     draw,
@@ -70,7 +77,7 @@ export default function createPlot(context, dimensions) {
   };
   
   function noiseFunction(vertex) {
-    return noise(vertex, 1, 1, 5)
+    return noise(vertex, 1, 1, 5);
 
     function noise(vertex, strength, frequency, depth) {
       const recursive_noise = depth > 0 ?
@@ -86,16 +93,18 @@ export default function createPlot(context, dimensions) {
 
   function draw() {
 
-    flattenLineTree(lines).forEach(circle => {
+    lines.forEach(circle => {
       context.beginPath();
+      context.lineWidth = pen_thickness;
       circle.forEach(p => context.lineTo(p[0], p[1]));
       context.stroke();
     });
   }
 
   function print() {
-    return polylinesToSVG(flattenLineTree(lines), {
-      dimensions
+    return polylinesToSVG(lines, {
+      dimensions : dimensions,
+      lineWidth  : pen_thickness
     });
   }
 }

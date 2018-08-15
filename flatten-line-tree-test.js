@@ -130,6 +130,26 @@ test("Lines to list - medium", function(t) {
   t.end();
 });
 
+test("Lines to list - single element array", function(t) {
+  const input = [[
+    [ [ 1,  2], [ 2,  5] ],
+    [ [-6,  1], [ 5, -1] ],
+    [ [ 2,  5], [ 3,  1] ],
+    [ [-6,  2], [-7, -3] ],
+    [ [-5, -2], [-7, -7] ]
+  ]];
+  const output = [
+    [ [ 1,  2], [ 2,  5] ],
+    [ [-6,  1], [ 5, -1] ],
+    [ [ 2,  5], [ 3,  1] ],
+    [ [-6,  2], [-7, -3] ],
+    [ [-5, -2], [-7, -7] ]
+  ];
+
+  t.deepEqual(linesToList(input), output);
+  t.end();
+});
+
 test("Lines to list - deep", function(t) {
   const input = [ 
     [
