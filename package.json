@@ -10,6 +10,7 @@
     "line-segment-intersection": "git+https://github.com/Evelios/line-segment-intersection.git",
     "new-array": "^1.0.0",
     "optimize-paths": "git+https://github.com/Evelios/optimize-path.git",
+    "penplot-stroke": "git+https://github.com/Evelios/penplot-stroke.git",
     "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
     "simplex-noise": "^2.4.0",
     "vector": "git+https://github.com/Evelios/Vector.git",
