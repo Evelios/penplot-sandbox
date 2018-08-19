@@ -14,6 +14,7 @@
     "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
     "simplex-noise": "^2.4.0",
     "vector": "git+https://github.com/Evelios/Vector.git",
+    "voronoi": "^1.0.0",
     "worley-noise": "^1.0.1"
   },
   "devDependencies": {
