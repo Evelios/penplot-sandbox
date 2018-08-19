@@ -6,6 +6,7 @@
   "repository": "https://github.com/Evelios/penplot-sandbox",
   "dependencies": {
     "adaptive-poisson-sampling": "git+https://github.com/Evelios/adaptive-poisson-sampling.git",
+    "alea": "0.0.9",
     "flow-field": "git+https://github.com/Evelios/flow-field.git",
     "line-segment-intersection": "git+https://github.com/Evelios/line-segment-intersection.git",
     "new-array": "^1.0.0",
