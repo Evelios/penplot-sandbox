@@ -12,6 +12,7 @@
     "new-array": "^1.0.0",
     "optimize-paths": "git+https://github.com/Evelios/optimize-path.git",
     "penplot-stroke": "git+https://github.com/Evelios/penplot-stroke.git",
+    "polygon-crosshatching": "git+https://github.com/Evelios/polygon-crosshatching.git",
     "regular-polygon": "git+https://github.com/Evelios/regular-polygon.git",
     "simplex-noise": "^2.4.0",
     "vector": "git+https://github.com/Evelios/Vector.git",

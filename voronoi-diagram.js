@@ -1,20 +1,16 @@
-// Utilities
 import { PaperSize, Orientation } from 'penplot';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
-// import { randomFloat } from 'penplot/util/util/random' // not using regPoly(random)
+// import { randomFloat } from 'penplot/util/util/random'
 import flattenLineTree from './flatten-line-tree';
 import optimizePaths from 'optimize-paths';
-import Alea from 'alea';
-import newArray from 'new-array';
-// Geometry
 import regularPolygon from 'regular-polygon';
 import Vector from 'vector';
 import poisson from 'adaptive-poisson-sampling';
 import Voronoi from 'voronoi';
-// Drawing
+import newArray from 'new-array';
 import createStroke from 'penplot-stroke';
-import polyCrosshatch from 'polygon-crosshatching';
+import Alea from 'alea';
 
 export const orientation = Orientation.LANDSCAPE;
 export const dimensions = PaperSize.LETTER;
@@ -88,7 +84,7 @@ export default function createPlot(context, dimensions) {
         [edge.vb.x, edge.vb.y],
       ];
     });
-
+  
   // ---- Logging From Voronoi Logic ----
 
   // console.log('Centers : ', centers);
@@ -98,9 +94,8 @@ export default function createPlot(context, dimensions) {
   // console.log('Diagram', voronoi_diagram);
   // console.log('Vertices', voronoi_diagram.vertices);
   // console.log('Edges : ', voronoi_diagram.edges);
-  // console.log('Cells : ', voronoi_diagram.cells);
 
-  // ---- Drawing Logic --------------------------------------------------------
+  // ---- Main Program ---------------------------------------------------------
 
   const center_dots = centers
     .map(point => regularPolygon(center_verticies, point, point_radius))
@@ -116,21 +111,14 @@ export default function createPlot(context, dimensions) {
     .map(line => createStroke(line, corner_weight, pen_width));
 
   const voronoi_strokes = voronoi_lines
-    .map(line => createStroke(line, voronoi_width, pen_width));
-  
-  const tile_strokes = voronoi_diagram.cells
-    .filter(tile => tile.halfedges.length > 0)
-    .reduce((acc, tile) => acc.concat([tile.halfedges]), [])
-    // .map(halfedge => halfedge.map(v => [v.x, v.y]));
-    ;
-    
-  
+    .map(line => createStroke(line, voronoi_width, pen_width))
+
+
   // ---- Logging From Drawing Logic ----
 
   // console.log('Corner Dots :', corner_dots);
   // console.log('Center Dots :', center_dots);
   // console.log('Voronoi Strokes :', voronoi_strokes);
-  console.log('Tile Strokes : ', tile_strokes);
 
   // ---- Create the Main Drawing Container ------------------------------------
   let lines = [
