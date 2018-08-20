@@ -2,7 +2,7 @@
 import { PaperSize, Orientation } from 'penplot';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
-// import { randomFloat } from 'penplot/util/util/random' // not using regPoly(random)
+import { randomFloat } from 'penplot/util/random';
 import flattenLineTree from './flatten-line-tree';
 import optimizePaths from 'optimize-paths';
 import Alea from 'alea';
@@ -50,6 +50,7 @@ export default function createPlot(context, dimensions) {
   const center_weight = pen_width * 6;
   const corner_weight = pen_width * 3;
   // const deluany_width = pen_width;
+  const hatching_density = 0.01;
 
   // ---- Main Program ---------------------------------------------------------
 
@@ -121,7 +122,23 @@ export default function createPlot(context, dimensions) {
   const tile_strokes = voronoi_diagram.cells
     .filter(tile => tile.halfedges.length > 0)
     .reduce((acc, tile) => acc.concat([tile.halfedges]), [])
-    // .map(halfedge => halfedge.map(v => [v.x, v.y]));
+    .map(halfedges => {
+      return halfedges
+        .filter(halfedge => halfedge.edge.lSite && halfedge.edge.rSite)
+        // Convert edge to [ [x,y], [x,y] ]
+        .map(halfedge => {
+          return [
+            [halfedge.edge.lSite.x, halfedge.edge.lSite.y],
+            [halfedge.edge.rSite.x, halfedge.edge.rSite.y] 
+          ];
+      })
+    })
+    .filter(edges => edges.length >= 3)
+    // .map(poly => {
+    //   console.log(poly);
+    //   console.log(polyCrosshatch(poly, hatching_density, randomFloat(2*Math.PI)))
+    //   return polyCrosshatch(poly, hatching_density, randomFloat(2*Math.PI));
+    // });
     ;
     
   
@@ -134,12 +151,15 @@ export default function createPlot(context, dimensions) {
 
   // ---- Create the Main Drawing Container ------------------------------------
   let lines = [
-    corner_dots,
-    center_dots,
+    // corner_dots,
+    // center_dots,
     // voronoi_lines,
-    voronoi_strokes,
-    deluany_lines
+    // voronoi_strokes,
+    // deluany_lines,
+    tile_strokes,
   ];
+
+  console.log('Lines : ', lines);
 
   // ---- Clip the Lines to the Frame ----
   const box = [margin, margin, working_width, working_height];
