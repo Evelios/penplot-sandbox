@@ -52,19 +52,7 @@ export default function createPlot(context, dimensions) {
   // const rng = Math.random;
 
   // Algorithm Parameters
-  const min_density = 0.25;
-  const max_density = 1.5;
-  const center_distance = 5;
-  const max_distance = working_width / 2;
-
-  const normalized_distribution = (vert) => {
-    const center_distribution = Math.max(0, Vector.distance(vert, center) - center_distance);
-    return Math.pow(center_distribution / max_distance, 2);
-  };
-
-  const point_density = (vert) => {
-    return min_density + normalized_distribution(vert) * (max_density - min_density);
-  };
+  const density = 1;
   
   // Drawing properties
   const pen_width = 0.02;
@@ -80,7 +68,7 @@ export default function createPlot(context, dimensions) {
   // ---- Main Program ---------------------------------------------------------
 
   // ---- Create Points from the Poisson Distribution ----
-  const centers = poisson(dimensions, point_density, rng);
+  const centers = poisson(dimensions, density, rng);
   
   // --- Create The Voronoi Diagram ----
   const voronoi_sites = centers.map(vert => {
@@ -106,10 +94,6 @@ export default function createPlot(context, dimensions) {
 
   // Convert the cells of the voronoi diagram into polygon verticies
   const tiles = voronoi_diagram.cells
-    // Filter out the center tiles below the threshold
-    .filter(tile => Vector.distance([tile.site.x, tile.site.y], center) > center_distance)
-    // Randomly filter out some tiles based on the distribution
-    .filter(tile => randomFloat(0.4) > normalized_distribution([tile.site.x, tile.site.y]))
     // Make sure the cell has halfedges
     .filter(tile => tile.halfedges.length > 0)
     // Flatten the cell data structure
@@ -127,7 +111,7 @@ export default function createPlot(context, dimensions) {
         });
     })
     // Polygon must have 3 or more edges
-    .filter(edges => edges.length >= 3)
+    .filter(edges => edges.length >= 3 || console.log(edges))
     // Flatten segments into a single array of verticies
     .map(edges => edges.reduce((acc, edge) => acc.concat(edge)))
     // Remove duplicate verticies
@@ -173,7 +157,7 @@ export default function createPlot(context, dimensions) {
     .map(line => createStroke(line, voronoi_width, pen_width));
   
   const tile_strokes = tiles
-    .map(tile => polyCrosshatch(tile, hatching_density, randomFloat(2*Math.PI)));
+    .map(tile => polyCrosshatch(tile, hatching_density, randomFloat(2*Math.PI)))
     // .filter(() => Math.random() < 0.9);
 
   const tile_outline = tiles
@@ -195,7 +179,7 @@ export default function createPlot(context, dimensions) {
     // voronoi_strokes,
     // deluany_lines,
     tile_strokes,
-    // tile_outline,
+    tile_outline,
   ];
 
   // console.log('Lines : ', lines);
