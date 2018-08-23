@@ -2,11 +2,11 @@
 import { PaperSize, Orientation } from 'penplot';
 import { polylinesToSVG } from 'penplot/util/svg';
 import { clipPolylinesToBox } from 'penplot/util/geom';
-import { randomFloat, setSeed } from 'penplot/util/random';
+import { randomFloat, randomInt, setSeed } from 'penplot/util/random';
 import flattenLineTree from './flatten-line-tree';
 import optimizePaths from 'optimize-paths';
 import Alea from 'alea';
-import newArray from 'new-array';
+import array from 'new-array';
 // Geometry
 import regularPolygon from 'regular-polygon';
 import Vector from 'vector';
@@ -45,17 +45,34 @@ export default function createPlot(context, dimensions) {
   ];
 
   // Random Number Generation
-  const seed = Math.random();
+  const seed = array(32).map(_ => String.fromCharCode(randomInt(41, 126))).join('');
+  console.log('Seed : ', seed);
   const alea = new Alea(seed);
   const rng = alea;
   setSeed(seed);
-  // const rng = Math.random;
 
   // Algorithm Parameters
   const min_density = 0.25;
-  const max_density = 1.5;
+  const max_density = 5;
   const center_distance = 5;
   const max_distance = working_width / 2;
+  const center_spec_size = 0.75;
+  const large_tile_filter = 0.35;
+  
+  
+  // Drawing properties
+  const background_color = '#eaeaea';
+  const pen_width = 0.03;
+  const point_radius = 0.1;
+  const voronoi_width = pen_width * 3;
+  const center_weight = pen_width * 6;
+  const corner_weight = pen_width * 3;
+  const corner_verticies = 5;
+  const center_verticies = 6;
+  // const deluany_width = pen_width;
+  const max_crosshatching = 1;
+  const min_crosshatching = 0.05;
+  const hatching_density = 0.1;
 
   const normalized_distribution = (vert) => {
     const center_distribution = Math.max(0, Vector.distance(vert, center) - center_distance);
@@ -65,17 +82,6 @@ export default function createPlot(context, dimensions) {
   const point_density = (vert) => {
     return min_density + normalized_distribution(vert) * (max_density - min_density);
   };
-  
-  // Drawing properties
-  const pen_width = 0.02;
-  const point_radius = 0.1;
-  const voronoi_width = pen_width * 3;
-  const center_weight = pen_width * 6;
-  const corner_weight = pen_width * 3;
-  const corner_verticies = 5;
-  const center_verticies = 6;
-  // const deluany_width = pen_width;
-  const hatching_density = 0.1;
 
   // ---- Main Program ---------------------------------------------------------
 
@@ -107,9 +113,10 @@ export default function createPlot(context, dimensions) {
   // Convert the cells of the voronoi diagram into polygon verticies
   const tiles = voronoi_diagram.cells
     // Filter out the center tiles below the threshold
-    .filter(tile => Vector.distance([tile.site.x, tile.site.y], center) > center_distance)
+    .filter(tile => Vector.distance([tile.site.x, tile.site.y], center) > center_distance ||
+                    Vector.distance([tile.site.x, tile.site.y], center) < center_spec_size)
     // Randomly filter out some tiles based on the distribution
-    .filter(tile => randomFloat(0.4) > normalized_distribution([tile.site.x, tile.site.y]))
+    .filter(tile => randomFloat(large_tile_filter) > normalized_distribution([tile.site.x, tile.site.y]))
     // Make sure the cell has halfedges
     .filter(tile => tile.halfedges.length > 0)
     // Flatten the cell data structure
@@ -173,7 +180,11 @@ export default function createPlot(context, dimensions) {
     .map(line => createStroke(line, voronoi_width, pen_width));
   
   const tile_strokes = tiles
-    .map(tile => polyCrosshatch(tile, hatching_density, randomFloat(2*Math.PI)));
+    .map(tile => {
+      // Make the tiles more dense in the center and dispursed outside
+      const density = min_crosshatching + normalized_distribution(tile[0]) * (max_crosshatching - min_crosshatching);
+      return polyCrosshatch(tile, density, randomFloat(2*Math.PI));
+    });
     // .filter(() => Math.random() < 0.9);
 
   const tile_outline = tiles
@@ -207,7 +218,7 @@ export default function createPlot(context, dimensions) {
   return {
     draw,
     print,
-    background: '#eaeaea',
+    background: background_color,
     animate: false,
     clear: true
   };
